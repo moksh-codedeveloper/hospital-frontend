@@ -3,8 +3,7 @@
 import { useState, ChangeEvent } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-// import { Button } from "@/components/ui/button"
-import { LoadingButton } from "@/components/ui/LoadingButton";
+import { Button } from "@/components/ui/button"
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
 import API from "@/utils/axios";
@@ -45,9 +44,6 @@ export default function RegisterPage() {
         },
       });
       fireConfetti();
-      setTimeout(() => {
-        router.push("/login");
-      }, 2000);
     } catch (err: any) {
       toast.error(err?.response?.data?.message || "Registration failed");
     } finally {
@@ -90,9 +86,9 @@ export default function RegisterPage() {
               onChange={handleChange}
             />
           </div>
-          <LoadingButton type="submit" isLoading={loading}>
-            Register
-          </LoadingButton>
+          <Button onClick={handleRegister} disabled={loading}>{
+            loading ? "Loading..." : "Register"
+        }</Button>
         </CardContent>
       </Card>
     </div>
