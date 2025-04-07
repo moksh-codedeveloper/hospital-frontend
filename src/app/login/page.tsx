@@ -6,6 +6,8 @@ import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
 import {fireConfetti} from "@/lib/confetti"; // Utility file with confetti logic
 import { useAuthStore } from "@/store/authStore"; // Assuming you have a store for auth
+import { Label } from "@/components/ui/label"; // Assuming you have a label component
+import Link from "next/link";
 export default function LoginPage() {
   const router = useRouter();
 
@@ -46,6 +48,7 @@ export default function LoginPage() {
       <Button onClick={handleLogin} className="w-full">
         {loading ? "Loading..." : "Login"}
       </Button>
+      <Label><Link href={"/register"}>Go to register</Link></Label>
     </div>
   );
 }
