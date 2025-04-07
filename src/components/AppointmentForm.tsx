@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { useAppointmentStore } from '@/store/appointmentStore';
-
+import { toast } from 'sonner';
 export default function AppointmentForm() {
   const [form, setForm] = useState({ doctor: '', reason: '', date: '', time: '' });
   const { createAppointment, loading } = useAppointmentStore();
@@ -14,9 +14,28 @@ export default function AppointmentForm() {
   };
 
   const handleSubmit = async () => {
-    await createAppointment(form);
-    setForm({ doctor: '', reason: '', date: '', time: '' });
+    try {
+      await createAppointment(form);
+  
+      // ✅ Show toast
+      toast("Appointment booked successfully!", {
+        icon: "✅",
+        style: {
+          background: '#333',
+          color: '#fff',
+        },
+      });
+  
+      // ✅ Reset form fields
+      setForm({ doctor: '', reason: '', date: '', time: '' });
+  
+    } catch (error: any) {
+      error.response?.data?.message
+        ? alert(error.response.data.message)
+        : alert('An error occurred while booking the appointment.');
+    }
   };
+  
 
   return (
     <div className="space-y-4">

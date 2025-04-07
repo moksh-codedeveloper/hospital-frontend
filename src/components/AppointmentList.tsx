@@ -1,20 +1,20 @@
 'use client';
-
 import { useEffect } from 'react';
 import { useAppointmentStore } from '@/store/appointmentStore';
 import { Button } from '@/components/ui/button';
 
 export default function AppointmentList() {
-  const { appointments, fetchAppointments, deleteAppointment, loading } = useAppointmentStore();
-
+  const { appointments = [], fetchAppointments, deleteAppointment, loading } = useAppointmentStore();
+  
   useEffect(() => {
     fetchAppointments();
-  }, []);
+  }, [fetchAppointments]);
 
   return (
     <div className="space-y-4">
-      {appointments.length === 0 && !loading && <p>No appointments found.</p>}
-      {appointments.map((a) => (
+      {loading && <p>Loading appointments...</p>}
+      {!loading && (!appointments || appointments.length === 0) && <p>No appointments found.</p>}
+      {appointments && appointments.map((a) => (
         <div key={a._id} className="p-4 border rounded-md shadow-md space-y-1">
           <p><strong>Doctor:</strong> {a.doctor}</p>
           <p><strong>Reason:</strong> {a.reason}</p>
@@ -27,4 +27,4 @@ export default function AppointmentList() {
       ))}
     </div>
   );
-}
+} 
