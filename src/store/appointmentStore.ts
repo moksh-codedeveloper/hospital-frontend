@@ -25,7 +25,7 @@ export const useAppointmentStore = create<AppointmentStore>((set) => ({
   fetchAppointments: async () => {
     set({ loading: true });
     try {
-      const res = await axios.get('/appointments/my');
+      const res = await axios.get('/appointments');
       set({ appointments: res.data.appointments });
     } catch (err) {
       console.error('Fetch error:', err);
@@ -37,7 +37,7 @@ export const useAppointmentStore = create<AppointmentStore>((set) => ({
   createAppointment: async (data) => {
     set({ loading: true });
     try {
-      const res = await axios.post('/appointments/create', data);
+      const res = await axios.post('/appointments', data);
       set((state) => ({
         appointments: [...state.appointments, res.data.appointment],
       }));
