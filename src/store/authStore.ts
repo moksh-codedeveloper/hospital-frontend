@@ -1,7 +1,8 @@
 // store/authStore.ts
 import { create } from "zustand";
-import axios from "@/utils/axios";
+import API from "@/utils/axios";
 import { toast } from "sonner";
+import { fireConfetti } from "@/lib/confetti";
 
 interface User {
   _id: string;
@@ -27,7 +28,7 @@ export const useAuthStore = create<AuthState>((set) => ({
   fetchUser: async () => {
     try {
       set({ loading: true });
-      const res = await axios.get("/auth/me", { withCredentials: true });
+      const res = await API.get("/auth/me", { withCredentials: true });
       set({ user: res.data.user, loading: false });
     } catch (err) {
       console.error("Fetch user error:", err);
@@ -38,7 +39,7 @@ export const useAuthStore = create<AuthState>((set) => ({
   login: async ({ email, password }) => {
     try {
       set({ loading: true });
-      await axios.post(
+      await API.post(
         "/auth/login",
         { email, password },
         { withCredentials: true }
@@ -55,24 +56,20 @@ export const useAuthStore = create<AuthState>((set) => ({
   register: async ({ name, email, password, role }) => {
     try {
       set({ loading: true });
-      await axios.post(
+      await API.post(
         "/auth/register",
         { name, email, password, role },
         { withCredentials: true }
       );
       toast("Registered successfully!", {
-        action: {
-          label: "🎉 click me",
-          onClick: () => {
-            // fireConfetti(); // you can define this somewhere
-          },
-        },
+        icon: "🎉",
         style: {
           border: "1px solid #4caf50",
           backgroundColor: "#e8f5e9",
           color: "#2e7d32",
         },
       });
+      fireConfetti();
     } catch (err: any) {
       toast.error(err.response?.data?.message || "Registration failed");
     } finally {
@@ -82,7 +79,7 @@ export const useAuthStore = create<AuthState>((set) => ({
 
   logout: async () => {
     try {
-      await axios.get("/auth/logout", { withCredentials: true });
+      await API.get("/auth/logout", { withCredentials: true });
       set({ user: null });
       toast.success("Logged out!");
     } catch (err) {

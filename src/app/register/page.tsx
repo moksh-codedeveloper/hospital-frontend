@@ -5,10 +5,9 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button"
 import { Label } from "@/components/ui/label";
-import { toast } from "sonner";
-import API from "@/utils/axios";
-import { fireConfetti } from "@/lib/confetti";
 import { useRouter } from "next/navigation";
+import { useAuthStore } from "@/store/authStore";
+import { fireConfetti } from "@/lib/confetti";
 interface RegisterData {
   name: string;
   email: string;
@@ -18,6 +17,7 @@ interface RegisterData {
 
 export default function RegisterPage() {
   const router = useRouter();
+  const { register } = useAuthStore();
   const [loading, setLoading] = useState(false);
   const [form, setForm] = useState<RegisterData>({
     name: "",
@@ -34,19 +34,12 @@ export default function RegisterPage() {
   const handleRegister = async () => {
     try {
       setLoading(true);
-      await API.post("/auth/register", form);
-      toast("Registered successfully!",{
-        icon: "🎉",
-        style: {
-          border: "1px solid #4caf50",
-          backgroundColor: "#e8f5e9",
-          color: "#2e7d32",
-        },
-      });
+      await register(form);
+      router.push("/login");
       fireConfetti();
-    } catch (err: any) {
-      toast.error(err?.response?.data?.message || "Registration failed");
-    } finally {
+    } catch (error:any) {
+      console.error("Registration error:", error.message);
+    } finally{
       setLoading(false);
     }
   };
