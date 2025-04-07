@@ -3,42 +3,25 @@
 import { useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import axios from "@/utils/axios"; // Make sure you have this setup
-import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 import {fireConfetti} from "@/lib/confetti"; // Utility file with confetti logic
-
+import { useAuthStore } from "@/store/authStore"; // Assuming you have a store for auth
 export default function LoginPage() {
   const router = useRouter();
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-
+  const [loading, setLoading] = useState(false);
+  const { login } = useAuthStore();
   const handleLogin = async () => {
     try {
-      const res = await axios.post(
-        "/auth/login",
-        { email, password },
-        { withCredentials: true }
-      );
-
-      toast("Logged in successfully!", {
-        action: {
-          label: "🎉 Boom",
-          onClick: () => fireConfetti(),
-        },
-        style: {
-          border: "1px solid #4caf50",
-          backgroundColor: "#e8f5e9",
-          color: "#2e7d32",
-        },
-      });
-
+      setLoading(true);
+      await login({ email, password });
+      // toast("Login successful! 🎉");
       fireConfetti();
-
-      router.push("/profile"); // or wherever your post-login route is
-    } catch (error: any) {
-      toast.error("Login failed. Check your credentials.");
+      router.push("/");
+    } catch (error) {
+      
     }
   };
 
@@ -61,7 +44,7 @@ export default function LoginPage() {
         className="mb-4"
       />
       <Button onClick={handleLogin} className="w-full">
-        Login
+        {loading ? "Loading..." : "Login"}
       </Button>
     </div>
   );

@@ -81,7 +81,6 @@ export const useAuthStore = create<AuthState>((set) => ({
     try {
       await API.get("/auth/logout", { withCredentials: true });
       set({ user: null });
-      toast.success("Logged out!");
     } catch (err) {
       toast.error("Logout failed");
       console.error("Logout error:", err);
