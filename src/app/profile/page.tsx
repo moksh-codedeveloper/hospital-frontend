@@ -1,16 +1,16 @@
 "use client";
-
 import React, { useEffect } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { useAuthStore } from "@/store/authStore";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { fireConfetti } from "@/lib/confetti";
-import { useRouter } from "next/router";
+import { useRouter } from "next/navigation";
+import AppointmentForm from "@/components/AppointmentForm";
+import AppointmentList from "@/components/AppoitmentList";
 export default function ProfilePage() {
-    const router = useRouter();
+  const router = useRouter();
   const { user, fetchUser, logout } = useAuthStore();
-
   useEffect(() => {
     fetchUser();
   }, []);
@@ -50,6 +50,14 @@ export default function ProfilePage() {
           {/* You can later add a summary of appointments here */}
           <div className="mt-4">
             <Button onClick={handleLogout}>Logout</Button>
+          </div>
+          <div className="mt-4">
+            <h3 className="text-xl font-semibold">Book an Appointment</h3>
+            <AppointmentForm />
+          </div>
+          <div className="mt-4">
+            <h3 className="text-xl font-semibold">Your Appointments</h3>
+            <AppointmentList />
           </div>
         </CardContent>
       </Card>

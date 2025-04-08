@@ -1,65 +1,72 @@
-// store/appointmentStore.ts
-import { create } from 'zustand';
-import axios from 'axios';
+import { create } from "zustand";
+import axios from "@/utils/axios";
 
-interface Appointment {
+type Appointment = {
   _id: string;
   doctorName: string;
   department: string;
   appointmentDate: string;
   appointmentTime: string;
   reason: string;
-  status: string;
-}
+};
 
-interface AppointmentStore {
+type AppointmentStore = {
   appointments: Appointment[];
   currentId: string | null;
-  createAppointment: (data: Omit<Appointment, '_id' | 'status'>) => Promise<void>;
+  setCurrentId: (id: string) => void;
+  createAppointment: (data: Partial<Appointment>) => Promise<void>;
   getAppointments: () => Promise<void>;
-  updateAppointment: (data: Partial<Appointment>) => Promise<void>;
   deleteAppointment: () => Promise<void>;
-}
+  updateAppointment: (data: Partial<Appointment>) => Promise<void>;
+};
 
 export const useAppointmentStore = create<AppointmentStore>((set, get) => ({
   appointments: [],
   currentId: null,
 
+  setCurrentId: (id) => set({ currentId: id }),
+
   createAppointment: async (data) => {
-    const res = await axios.post('/api/appointments/create', data);
-    const newAppointment = res.data;
+    const res = await axios.post("/appointments/create", data, {
+      withCredentials: true,
+    });
     set((state) => ({
-      appointments: [...state.appointments, newAppointment],
-      currentId: newAppointment._id, // store _id for future use
+      appointments: [...state.appointments, res.data],
     }));
   },
 
   getAppointments: async () => {
-    const res = await axios.get('/api/appointments/my');
+    const res = await axios.get("/appointments/my", {
+      withCredentials: true,
+    });
     set({ appointments: res.data });
   },
 
-  updateAppointment: async (data) => {
-    const { currentId } = get();
-    if (!currentId) throw new Error("No current appointment selected");
-    const res = await axios.post('/api/appointments/update', {
-      appointmentId: currentId,
-      ...data,
+  deleteAppointment: async () => {
+    const _id = get().currentId;
+    if (!_id) return;
+    await axios.post("/appointments/delete", { _id: _id }, {
+      withCredentials: true,
     });
     set((state) => ({
-      appointments: state.appointments.map((a) =>
-        a._id === currentId ? res.data : a
-      ),
+      appointments: state.appointments.filter((a) => a._id !== _id),
     }));
   },
 
-  deleteAppointment: async () => {
-    const { currentId } = get();
-    if (!currentId) throw new Error("No appointment to delete");
-    await axios.post('/api/appointments/delete', { appointmentId: currentId });
+  updateAppointment: async (data) => {
+    const id = get().currentId;
+    if (!id) return;
+    const res = await axios.post("/appointments/update", {
+      _id: id,
+      ...data,
+    }, {
+      withCredentials: true,
+    });
+
     set((state) => ({
-      appointments: state.appointments.filter((a) => a._id !== currentId),
-      currentId: null,
+      appointments: state.appointments.map((a) =>
+        a._id === id ? res.data : a
+      ),
     }));
   },
 }));
