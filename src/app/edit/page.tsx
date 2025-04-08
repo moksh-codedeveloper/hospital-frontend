@@ -1,5 +1,6 @@
 'use client';
-
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useAppointmentStore } from "@/store/appointmentStore";
@@ -12,9 +13,10 @@ import confetti from "canvas-confetti";
 export default function EditPage() {
   const router = useRouter();
   const { appointments, currentId, getAppointments, updateAppointment } = useAppointmentStore();
-
   const selectedAppointment = appointments.find((a) => a._id === currentId);
-
+  const [doctorName, setDoctoreName] = useState("");
+  const [department, setDepartment] = useState("");
+  const [time, setTime] = useState("");
   const [reason, setReason] = useState("");
   const [date, setDate] = useState("");
 
@@ -31,7 +33,9 @@ export default function EditPage() {
     const updates: { [key: string]: string } = {};
     if (reason !== selectedAppointment?.reason) updates.reason = reason;
     if (date !== selectedAppointment?.appointmentDate.slice(0, 10)) updates.date = date;
-  
+    if (time !== selectedAppointment?.appointmentTime) updates.time = time;
+    if (department !== selectedAppointment?.department.slice(0, 10)) updates.department = department;
+    if (doctorName !== selectedAppointment?.doctorName) updates.doctorName = doctorName;
     if (Object.keys(updates).length === 0) {
       toast.info("No changes detected.");
       return;
@@ -66,18 +70,44 @@ export default function EditPage() {
       <h1 className="text-2xl font-bold">Edit Appointment</h1>
 
       <div className="space-y-2">
-        <label className="block text-sm font-medium">Reason</label>
-        <input
+        <Label className="block text-sm font-medium">Reason</Label>
+        <Input
           type="text"
           value={reason}
           onChange={(e) => setReason(e.target.value)}
           className="w-full p-2 border rounded"
         />
       </div>
-
       <div className="space-y-2">
-        <label className="block text-sm font-medium">Date</label>
-        <input
+        <Label className="block text-sm font-medium">Doctor name</Label>
+        <Input
+          type="text"
+          value={doctorName}
+          onChange={(e) => setDoctoreName(e.target.value)}
+          className="w-full p-2 border rounded"
+        />
+      </div>
+      <div className="space-y-2">
+        <Label className="block text-sm font-medium">Department</Label>
+        <Input
+          type="text"
+          value={department}
+          onChange={(e) => setDepartment(e.target.value)}
+          className="w-full p-2 border rounded"
+        />
+      </div>
+      <div className="space-y-2">
+        <Label className="block text-sm font-medium">Time</Label>
+        <Input
+          type="text"
+          value={time}
+          onChange={(e) => setTime(e.target.value)}
+          className="w-full p-2 border rounded"
+        />
+      </div>
+      <div className="space-y-2">
+        <Label className="block text-sm font-medium">Date</Label>
+        <Input
           type="date"
           value={date}
           onChange={(e) => setDate(e.target.value)}
