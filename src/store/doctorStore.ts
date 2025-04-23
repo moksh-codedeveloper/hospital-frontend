@@ -4,7 +4,7 @@ import API from "@/utils/axios";
 import { toast } from "sonner";
 // import { useRouter } from "next/navigation";
 interface Doctor {
-  _id: string;
+  _id?: string;
   name: string;
   email: string;
   specialisation: string;
