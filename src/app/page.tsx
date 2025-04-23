@@ -7,15 +7,20 @@ import { Button } from "@/components/ui/button";
 import { useAuthStore } from "@/store/authStore";
 import Link from "next/link";
 import { ModeToggle } from "@/components/DarkMode";
-// import AboutPage from "./about/page";
+
 export default function App() {
-  const { user } = useAuthStore();
+  const { user, fetchUser } = useAuthStore();
   const [hasMounted, setHasMounted] = useState(false);
   const [greeted, setGreeted] = useState(false); // prevent multiple confetti/toast
 
+  // Fetch user on component mount
   useEffect(() => {
-    setHasMounted(true);
-  }, []);
+    const initUser = async () => {
+      await fetchUser(); // Fetch user data from API on mount
+      setHasMounted(true); // Ensure rendering after the user is fetched
+    };
+    initUser();
+  }, [fetchUser]);
 
   useEffect(() => {
     if (hasMounted && user && !greeted) {
@@ -46,7 +51,7 @@ export default function App() {
       <ModeToggle />
       {user ? (
         <>
-          <p className="text-xl font-medium mb-4">Hello, {user.name} 👋</p>
+          <p className="text-xl font-medium mb-4">Hello, {user.username} 👋</p>
           <div className="flex gap-4">
             <Link href="/appointments">
               <Button>My Appointments</Button>

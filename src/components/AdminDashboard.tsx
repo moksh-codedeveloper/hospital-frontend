@@ -1,0 +1,206 @@
+'use client';
+
+import { useEffect, useState } from 'react';
+import { useDoctorStore } from '@/store/doctorStore';
+import {
+  Tabs,
+  TabsList,
+  TabsTrigger,
+  TabsContent,
+} from '@/components/ui/tabs';
+import {
+  Dialog,
+  DialogTrigger,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from '@/components/ui/dialog';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Table, TableHeader, TableBody, TableRow, TableCell } from '@/components/ui/table';
+import { toast } from 'sonner';
+
+const AdminDashboard = () => {
+  const {
+    doctors,
+    fetchDoctors,
+    addDoctor,
+    deleteDoctor,
+    updateDoctor,
+  } = useDoctorStore();
+
+  const [doctorData, setDoctorData] = useState({
+    username: '',
+    email: '',
+    specialisation: '',
+    experience: '',
+    password: ""
+  });
+  const [editDoctorId, setEditDoctorId] = useState<string | null>(null);
+  const [openEdit, setOpenEdit] = useState(false);
+
+  useEffect(() => {
+    fetchDoctors();
+  }, [fetchDoctors]);
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setDoctorData({ ...doctorData, [e.target.name]: e.target.value });
+  };
+
+  const handleCreate = async () => {
+    try {
+      await addDoctor(doctorData);
+      toast.success('Doctor added!');
+      setDoctorData({ username: "", email: '', specialisation: '', experience: '', password: "" });
+    } catch (err) {
+      toast.error('Failed to add doctor.');
+    }
+  };
+
+  const handleDelete = async (id: string) => {
+    try {
+      await deleteDoctor(id);
+      toast.success('Doctor deleted!');
+    } catch {
+      toast.error('Failed to delete doctor.');
+    }
+  };
+
+  const handleEditOpen = (doctor: any) => {
+    setDoctorData({
+      username: doctor.username || '',
+      email: doctor.email || '',
+      specialisation: doctor.specialisation || '',
+      experience: doctor.experience || '',
+      password: doctor.password || '',
+    });
+    setEditDoctorId(doctor._id);
+    setOpenEdit(true);
+  };
+
+  const handleUpdate = async () => {
+    if (!editDoctorId) return;
+    try {
+      await updateDoctor({ _id: editDoctorId, ...doctorData });
+      toast.success('Doctor updated!');
+      setOpenEdit(false);
+      setEditDoctorId(null);
+    } catch {
+      toast.error('Failed to update doctor.');
+    }
+  };
+  useEffect(() => {
+    const ids = doctors.map(doc => doc._id);
+    const hasDuplicates = new Set(ids).size !== ids.length;
+    if (hasDuplicates) {
+      console.warn("⚠️ Duplicate _id found in doctors list!");
+    }
+
+  }, [doctors]);
+  
+  return (
+    <div className="p-6">
+      <h1 className="text-2xl font-bold mb-4">Admin Dashboard</h1>
+      <Tabs defaultValue="create">
+        <TabsList className="mb-4">
+          <TabsTrigger value="create">Create Doctor</TabsTrigger>
+          <TabsTrigger value="view">View Doctors</TabsTrigger>
+        </TabsList>
+
+        {/* Create Tab */}
+        <TabsContent value="create">
+          <div className="grid gap-4 max-w-md">
+            <div>
+              <Label>Name</Label>
+              <Input name='username' value={doctorData.username} onChange={handleChange} />
+            </div>
+            <div>
+              <Label>Email</Label>
+              <Input name="email" value={doctorData.email} onChange={handleChange} />
+            </div>
+            <div>
+              <Label>Specialisation</Label>
+              <Input name="specialisation" value={doctorData.specialisation} onChange={handleChange} />
+            </div>
+            <div>
+              <Label>Password</Label>
+              <Input name="password" type="password" value={doctorData.password} onChange={handleChange} />
+            </div>
+            <div>
+              <Label>Experience</Label>
+              <Input name="experience" value={doctorData.experience} onChange={handleChange} />
+            </div>
+            <Button onClick={handleCreate}>Add Doctor</Button>
+          </div>
+        </TabsContent>
+
+        {/* View Tab */}
+        <TabsContent value="view">
+          {Array.isArray(doctors) && doctors.length === 0 ? (
+            <p>No doctors available.</p>
+          ) : (
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableCell>Name</TableCell>
+                  <TableCell>Email</TableCell>
+                  <TableCell>Specialisation</TableCell>
+                  <TableCell>Experience</TableCell>
+                  <TableCell>Actions</TableCell>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {doctors.filter(doc => doc && doc._id).map((doc) => (
+                  <TableRow key={doc._id}>
+                    <TableCell>{doc.username || 'No Name'}</TableCell>
+                    <TableCell>{doc.email || 'No Email'}</TableCell>
+                    <TableCell>{doc.specialisation || 'No Specialisation'}</TableCell>
+                    <TableCell>{doc.experience || 'No Experience'}</TableCell>
+                    <TableCell>
+                      <Button onClick={() => handleEditOpen(doc)} className="mr-2">Edit</Button>
+                      <Button onClick={() => handleDelete(doc._id!)} variant="destructive">Delete</Button>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          )}
+        </TabsContent>
+      </Tabs>
+
+      {/* Edit Dialog */}
+      <Dialog open={openEdit} onOpenChange={setOpenEdit}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Edit Doctor</DialogTitle>
+          </DialogHeader>
+          <div className="grid gap-4">
+            <div>
+              <Label>Name</Label>
+              <Input name="username" value={doctorData.username} onChange={handleChange} />
+            </div>
+            <div>
+              <Label>Email</Label>
+              <Input name="email" value={doctorData.email} onChange={handleChange} />
+            </div>
+            <div>
+              <Label>Specialisation</Label>
+              <Input name="specialisation" value={doctorData.specialisation} onChange={handleChange} />
+            </div>
+            <div>
+              <Label>Experience</Label>
+              <Input name="experience" value={doctorData.experience} onChange={handleChange} />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button onClick={handleUpdate}>Update</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    </div>
+  );
+};
+
+export default AdminDashboard;

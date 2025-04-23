@@ -3,16 +3,17 @@
 import { useState, ChangeEvent } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button"
+import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { useRouter } from "next/navigation";
 import { useAuthStore } from "@/store/authStore";
 import { fireConfetti } from "@/lib/confetti";
+
 interface RegisterData {
-  name: string;
+  username: string;
   email: string;
   password: string;
-  role: string
+  role: string;
 }
 
 export default function RegisterPage() {
@@ -20,10 +21,10 @@ export default function RegisterPage() {
   const { register } = useAuthStore();
   const [loading, setLoading] = useState(false);
   const [form, setForm] = useState<RegisterData>({
-    name: "",
+    username: "",
     email: "",
     password: "",
-    role: "patient"
+    role: "patient",
   });
 
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
@@ -37,9 +38,9 @@ export default function RegisterPage() {
       await register(form);
       router.push("/login");
       fireConfetti();
-    } catch (error:any) {
+    } catch (error: any) {
       console.error("Registration error:", error.message);
-    } finally{
+    } finally {
       setLoading(false);
     }
   };
@@ -50,13 +51,14 @@ export default function RegisterPage() {
         <CardContent className="p-6 space-y-4">
           <h2 className="text-2xl font-bold text-center">Register</h2>
           <div className="space-y-2">
-            <Label>Name</Label>
+            <Label>Username</Label>
             <Input
               type="text"
-              name="name"
+              name="username"
               placeholder="John Doe"
-              value={form.name}
+              value={form.username}
               onChange={handleChange}
+              className="border p-2 rounded-md"
             />
           </div>
           <div className="space-y-2">
@@ -67,6 +69,7 @@ export default function RegisterPage() {
               placeholder="you@example.com"
               value={form.email}
               onChange={handleChange}
+              className="border p-2 rounded-md"
             />
           </div>
           <div className="space-y-2">
@@ -77,11 +80,16 @@ export default function RegisterPage() {
               placeholder="••••••••"
               value={form.password}
               onChange={handleChange}
+              className="border p-2 rounded-md"
             />
           </div>
-          <Button onClick={handleRegister} disabled={loading}>{
-            loading ? "Loading..." : "Register"
-        }</Button>
+          <Button
+            onClick={handleRegister}
+            disabled={loading}
+            className="w-full mt-4"
+          >
+            {loading ? "Loading..." : "Register"}
+          </Button>
         </CardContent>
       </Card>
     </div>

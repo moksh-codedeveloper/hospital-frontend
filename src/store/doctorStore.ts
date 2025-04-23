@@ -2,10 +2,11 @@
 import { create } from "zustand";
 import API from "@/utils/axios";
 import { toast } from "sonner";
+// import { get } from "http";
 // import { useRouter } from "next/navigation";
 interface Doctor {
   _id?: string;
-  name: string;
+  username: string;
   email: string;
   specialisation: string;
   experience: string;
@@ -61,9 +62,12 @@ export const useDoctorStore = create<DoctorState>((set) => ({
       set({ loading: true });
       const res = await API.post("/doctors/create", doctor, { withCredentials: true });
       set((state) => ({
-        doctors: [...state.doctors, res.data.doctor],
+        doctors: [...state.doctors, res.data.data],
       }));
+      console.log("Doctor added:", res.data);
+      set({ doctor: res.data.doctor });
       toast.success("Doctor added successfully!");
+      set({loading: false})
     } catch (err) {
       set({ loading: false });
       toast.error("Failed to add doctor");
@@ -74,6 +78,34 @@ export const useDoctorStore = create<DoctorState>((set) => ({
   updateDoctor: async (doctor) => {
     try {
       set({ loading: true });
+      const getToken = await API.get("/auth/token/me", { withCredentials: true });
+      if (!getToken) {
+        toast.error("Token not found");
+        return;
+      }
+      if(getToken.data.success === true){
+        set({ doctor: getToken.data.user });
+        toast("Token found", {
+          description: "Token found",
+          duration: 2000,
+          style:{
+            backgroundColor: "green",
+            color: "black",
+            padding: "10px",
+            borderRadius: "5px",
+            fontSize: "16px",
+            fontWeight: "bold",
+            textAlign: "center",
+          },
+          position: "top-center",
+          action: {
+            label: "OK",
+            onClick: () => {
+              console.log("Token found");
+            },
+          },
+        });
+      }
       const res = await API.put(`/doctors/update/${doctor._id}`, doctor, { withCredentials: true });
       set((state) => ({
         doctors: state.doctors.map((doc) =>
