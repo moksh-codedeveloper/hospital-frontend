@@ -23,6 +23,7 @@ interface DoctorState {
   deleteDoctor: (doctorId: string) => Promise<void>;
   logout: () => Promise<void>;
   login: (data: { email: string; password: string }) => Promise<void>;
+  fetchDoctorFromToken: () => Promise<void>;
 }
 
 export const useDoctorStore = create<DoctorState>((set) => ({
@@ -43,6 +44,24 @@ export const useDoctorStore = create<DoctorState>((set) => ({
       console.error("Error fetching doctors:", err);
     }
   },
+  fetchDoctorFromToken: async () => {
+    try {
+      set({ loading: true });
+      const res = await API.get("/auth/token/me", { withCredentials: true });
+      if (res.data.success) {
+        set({ doctor: res.data.user, loading: false });
+        toast.success("Doctor authenticated via token");
+      } else {
+        set({ doctor: null, loading: false });
+        toast.error("Token invalid or expired");
+      }
+    } catch (err) {
+      set({ loading: false });
+      toast.error("Failed to fetch doctor from token");
+      console.error("fetchDoctorFromToken error:", err);
+    }
+  },
+  
 
   fetchDoctor: async (doctorId) => {
     try {
@@ -74,44 +93,30 @@ export const useDoctorStore = create<DoctorState>((set) => ({
       console.error("Error adding doctor:", err);
     }
   },
-
   updateDoctor: async (doctor) => {
     try {
       set({ loading: true });
-      const getToken = await API.get("/auth/token/me", { withCredentials: true });
-      if (!getToken) {
-        toast.error("Token not found");
+  
+      if (!doctor?._id) {
+        toast.error("Doctor ID is missing");
+        set({ loading: false });
         return;
       }
-      if(getToken.data.success === true){
-        set({ doctor: getToken.data.user });
-        toast("Token found", {
-          description: "Token found",
-          duration: 2000,
-          style:{
-            backgroundColor: "green",
-            color: "black",
-            padding: "10px",
-            borderRadius: "5px",
-            fontSize: "16px",
-            fontWeight: "bold",
-            textAlign: "center",
-          },
-          position: "top-center",
-          action: {
-            label: "OK",
-            onClick: () => {
-              console.log("Token found");
-            },
-          },
-        });
-      }
-      const res = await API.put(`/doctors/update/${doctor._id}`, doctor, { withCredentials: true });
+  
+      console.log("Doctor ID", doctor._id);
+      const res = await API.put(
+        `/doctors/update/${doctor._id}`,
+        doctor,
+        { withCredentials: true }
+      );
+  
       set((state) => ({
         doctors: state.doctors.map((doc) =>
           doc._id === doctor._id ? res.data.updatedDoctor : doc
         ),
+        loading: false,
       }));
+      
       toast.success("Doctor updated successfully!");
     } catch (err) {
       set({ loading: false });
@@ -119,6 +124,7 @@ export const useDoctorStore = create<DoctorState>((set) => ({
       console.error("Error updating doctor:", err);
     }
   },
+  
   login: async ({ email, password }) => {
     try {
         set({ loading: true });

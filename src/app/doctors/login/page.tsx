@@ -1,6 +1,7 @@
 // pages/login/doctor.tsx
+"use client";
 import React, { useState } from 'react';
-import { useRouter } from 'next/router';
+import { useRouter } from 'next/navigation';
 import {Card, CardContent ,CardHeader, CardTitle, CardDescription, CardFooter } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -8,10 +9,10 @@ import { Label } from '@/components/ui/label';
 import { useDoctorStore } from '@/store/doctorStore';
 
 const DoctorLogin = () => {
+  const router = useRouter();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
-  const router = useRouter();
   const { login } = useDoctorStore();
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -20,7 +21,7 @@ const DoctorLogin = () => {
 
     try {
         await login({ email, password });
-        // router.push('/doctor/dashboard');
+        router.push('/doctor/dashboard');
     } catch (err) {
       alert('Error logging in');
       console.error(err);

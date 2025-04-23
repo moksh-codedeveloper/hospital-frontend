@@ -41,33 +41,41 @@ const AdminDashboard = () => {
   const [editDoctorId, setEditDoctorId] = useState<string | null>(null);
   const [openEdit, setOpenEdit] = useState(false);
 
+  // Fetch doctors on component mount
   useEffect(() => {
     fetchDoctors();
   }, [fetchDoctors]);
 
+  // Handle form data change
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setDoctorData({ ...doctorData, [e.target.name]: e.target.value });
   };
 
+  // Create doctor
   const handleCreate = async () => {
     try {
       await addDoctor(doctorData);
       toast.success('Doctor added!');
       setDoctorData({ username: "", email: '', specialisation: '', experience: '', password: "" });
+      fetchDoctors();  // Refetch doctors to update the list
     } catch (err) {
       toast.error('Failed to add doctor.');
     }
   };
 
+  // Delete doctor
   const handleDelete = async (id: string) => {
+    if (!id) return;
     try {
       await deleteDoctor(id);
       toast.success('Doctor deleted!');
+      fetchDoctors();  // Refetch doctors to update the list after deletion
     } catch {
       toast.error('Failed to delete doctor.');
     }
   };
 
+  // Open the edit modal
   const handleEditOpen = (doctor: any) => {
     setDoctorData({
       username: doctor.username || '',
@@ -80,6 +88,7 @@ const AdminDashboard = () => {
     setOpenEdit(true);
   };
 
+  // Update doctor
   const handleUpdate = async () => {
     if (!editDoctorId) return;
     try {
@@ -87,19 +96,22 @@ const AdminDashboard = () => {
       toast.success('Doctor updated!');
       setOpenEdit(false);
       setEditDoctorId(null);
+      fetchDoctors();  // Refetch doctors to update the list after update
     } catch {
       toast.error('Failed to update doctor.');
     }
   };
+
+  // Check for duplicate _id in doctors list
   useEffect(() => {
-    const ids = doctors.map(doc => doc._id);
+    const validDoctors = doctors.filter(doc => doc && doc._id); // Filter out undefined or invalid doctors
+    const ids = validDoctors.map(doc => doc._id);
     const hasDuplicates = new Set(ids).size !== ids.length;
     if (hasDuplicates) {
       console.warn("⚠️ Duplicate _id found in doctors list!");
     }
-
   }, [doctors]);
-  
+
   return (
     <div className="p-6">
       <h1 className="text-2xl font-bold mb-4">Admin Dashboard</h1>
@@ -152,7 +164,7 @@ const AdminDashboard = () => {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {doctors.filter(doc => doc && doc._id).map((doc) => (
+                {doctors.filter(doc => doc !== undefined).map((doc) => (
                   <TableRow key={doc._id}>
                     <TableCell>{doc.username || 'No Name'}</TableCell>
                     <TableCell>{doc.email || 'No Email'}</TableCell>
