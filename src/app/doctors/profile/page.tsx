@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { toast } from 'sonner';
-
+import DoctorAppointments from '@/components/DoctorAppointmentList';
 export default function DoctorProfile() {
   const { doctor, fetchDoctorFromToken, updateDoctor, loading } = useDoctorStore();
   const [formData, setFormData] = useState({
@@ -68,6 +68,10 @@ export default function DoctorProfile() {
           <Button onClick={handleUpdate} disabled={loading} className="w-full mt-4">
             {loading ? "Updating..." : "Update Profile"}
           </Button>
+          <div className="mt-6">
+            <h3 className="text-lg font-semibold">My Appointments</h3>
+            <DoctorAppointments />
+          </div>
         </CardContent>
       </Card>
     </div>

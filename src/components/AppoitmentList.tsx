@@ -10,7 +10,6 @@ export default function AppointmentList() {
   const {
     appointments,
     getAppointments,
-    updateAppointment,
     deleteAppointment,
     setCurrentId,
   } = useAppointmentStore();

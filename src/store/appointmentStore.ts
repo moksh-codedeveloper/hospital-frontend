@@ -8,6 +8,8 @@ type Appointment = {
   appointmentDate: string;
   appointmentTime: string;
   reason: string;
+  status: "pending" | "confirmed" | "completed" | "canceled";
+  patientName: string;
 };
 
 type AppointmentStore = {

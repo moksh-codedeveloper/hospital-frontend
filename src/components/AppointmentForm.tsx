@@ -4,8 +4,9 @@ import { useAppointmentStore } from "@/store/appointmentStore";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-
+import { useAuthStore } from "@/store/authStore";
 export default function AppointmentForm() {
+  const { user, fetchUser } = useAuthStore();
   const { createAppointment } = useAppointmentStore();
   const [formData, setFormData] = useState({
     doctorName: "",
@@ -21,6 +22,7 @@ export default function AppointmentForm() {
 
   const handleSubmit = async () => {
     await createAppointment(formData);
+    await fetchUser();
     setFormData({
       doctorName: "",
       department: "",
@@ -37,6 +39,7 @@ export default function AppointmentForm() {
       <Input name="appointmentDate" type="date" value={formData.appointmentDate} onChange={handleChange} />
       <Input name="appointmentTime" type="time" value={formData.appointmentTime} onChange={handleChange} />
       <Textarea name="reason" placeholder="Reason" value={formData.reason} onChange={handleChange} />
+      {/* <Input name="patientName" placeholder="Patient Name" value={formData.patientName} onChange={handleChange} /> */}
       <Button onClick={handleSubmit}>Create Appointment</Button>
     </div>
   );
