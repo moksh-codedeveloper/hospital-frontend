@@ -87,7 +87,7 @@ export default function AdminLoginPage() {
         </CardContent>
         <CardFooter className="flex flex-col items-center gap-1">
           <CardDescription>
-            <Link href="/doctor/login" className="hover:underline">Doctor Login</Link>
+            <Link href="/doctors/login" className="hover:underline">Doctor Login</Link>
           </CardDescription>
           <CardDescription>
             <Link href="/login" className="hover:underline">Patient Login</Link>
