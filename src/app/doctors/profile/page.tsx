@@ -4,12 +4,14 @@ import { useEffect, useState } from 'react';
 import { useDoctorStore } from '@/store/doctorStore';
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
+import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { toast } from 'sonner';
+import { useRouter } from 'next/navigation';
 import DoctorAppointments from '@/components/DoctorAppointmentList';
 export default function DoctorProfile() {
-  const { doctor, fetchDoctorFromToken, updateDoctor, loading } = useDoctorStore();
+  const router = useRouter();
+  const { doctor, fetchDoctorFromToken, updateDoctor,logout , loading } = useDoctorStore();
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -43,7 +45,16 @@ export default function DoctorProfile() {
     }
     updateDoctor({ ...doctor, ...formData });
   };
-
+  const handleLogout = async () => {
+    try {
+      await logout();
+      toast.success("Logged out successfully");
+      router.push("/doctors/login");
+    } catch (error) {
+      toast.error("Error logging out");
+      console.error(error);
+    }
+  }
   return (
     <div className="flex justify-center mt-10">
       <Card className="w-full max-w-md shadow-lg">
@@ -73,6 +84,9 @@ export default function DoctorProfile() {
             <DoctorAppointments />
           </div>
         </CardContent>
+        <CardFooter>
+          <Button onClick={handleLogout}>Logout</Button>
+        </CardFooter>
       </Card>
     </div>
   );

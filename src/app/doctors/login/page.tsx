@@ -21,7 +21,7 @@ const DoctorLogin = () => {
 
     try {
         await login({ email, password });
-        router.push('/doctor/dashboard');
+        router.push('/doctors/profile');
     } catch (err) {
       alert('Error logging in');
       console.error(err);
