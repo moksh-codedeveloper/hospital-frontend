@@ -69,6 +69,12 @@ export default function App() {
           <Link href="/signup">
             <Button variant="outline">Signup</Button>
           </Link>
+          <Link href={"/admin/login"}>
+              <Button>Login as a admin</Button>
+          </Link>
+          <Link href={"/doctors/login"}>
+            <Button>Login as a Doctor</Button>
+          </Link>
         </div>
       )}
       <footer className="absolute bottom-4 text-sm text-muted-foreground">
